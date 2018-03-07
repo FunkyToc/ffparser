@@ -1,8 +1,8 @@
 # ffparser
 
 A PHP script to pull and recover "Final Fantasy 14 online" Top Weekly Players. Update each monday at 10AM.
-Pull weekly top players scoreboards, order by Grand Company points, on the official website of the game
-PHP crawler to Json array, store in SQL database.
+Pull weekly top players scoreboards, order by Grand Company points, on the official website of the game.
+Datas are stored in SQL database, with Json format.
 
 // Author
 * Name : FunkyToc 
