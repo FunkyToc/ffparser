@@ -17,6 +17,6 @@ Datas are stored in SQL database, with Json format.
 * Pulldate : every Monday, at 11AM 
 * Pulltime : ~1H / 1800 pages 
 * Requires : PHP 5.6+, PDO $db, MySQL 
-* Maintain : $worlds 
+* Maintain : $worlds (the servers list)
 
 Better to c*r*onfigure hook / cron to use this script automaticly !
