@@ -8,6 +8,7 @@ try
 	 *
 	 * Author : FunkyToc
 	 * Website : http://funkycoding.fr
+	 * FfParser : http://funkycoding.fr/ffparser
 	 * Update : 2018/03/07
 	 *
 	 * Website : http://fr.finalfantasyxiv.com
@@ -58,7 +59,7 @@ try
 		$pulledResult = [];
 		$results = [];
 
-		// DB date check 
+		// DB last update check 
 		$sql = $db->prepare('SELECT id, pulldate FROM ffparser WHERE world = :world LIMIT 1');
 		$sql->bindValue(':world', $world, PDO::PARAM_STR);
 		$sql->execute();
@@ -114,8 +115,7 @@ try
 					    
 					    $inc++;
 					}
-
-				} // END PARSER 
+				} // END 10 PAGES 
 
 				// Keep turning ON the PDO connection (PDO connection close itself after 30s of inactivity) 
 				$sql = $db->prepare('SELECT id FROM ffparser WHERE 1 LIMIT 1');
@@ -123,7 +123,7 @@ try
 
 			} // END COMPANY 
 
-			// COMPACT IN ONE ARRAY 
+			// Compact results 
 			$inc = 1;
 			foreach ($pulledResult as $company => $playerList) 
 			{	
@@ -134,7 +134,7 @@ try
 				}
 			}
 
-			// ORDER ARRAY BY SCORE 
+			// Order by score 
 			usort($results, function($a, $b) 
 			{
 			    return $b['score'] - $a['score'];
@@ -147,7 +147,7 @@ try
 			}
 
 
-			// DB UPDATE (or insert)
+			// Push results (update or insert)
 			if (!empty($results)) {
 
 				$json_results = json_encode($results);
