@@ -16,7 +16,7 @@ Datas are stored in SQL database, with Json format.
 * Frequency : 1 / week 
 * Pulldate : every Monday, at 11AM 
 * Pulltime : ~1H / 1800 pages 
- *Requires : PHP 5.6+, PDO $db, MySQL 
+* Requires : PHP 5.6+, PDO $db, MySQL 
 * Maintain : $worlds 
 
 Better to c*r*onfigure hook / cron to use this script automaticly !
