@@ -1,29 +1,6 @@
 <?php 
 try 
 {
-	/* 
-	 * Final Fantasy 14 Online Parser
-	 * Pull weekly top players scoreboards, order by Grand Company points, on the official website of the game
-	 * PHP crawler to Json array, store in SQL database 
-	 *
-	 * Author : FunkyToc
-	 * Website : http://funkycoding.fr
-	 * Exemple : http://funkycoding.fr/ffparser
-	 * Update : 2018/03/19
-	 *
-	 * Url : http://fr.finalfantasyxiv.com
-	 * Target : http://fr.finalfantasyxiv.com/lodestone/ranking/gc/weekly/
-	 * Frequency : 1 / week
-	 * Pulldate : every Monday, at 11AM
-	 * Pulltime : ~1H / 1800 pages
-	 * Requires : PHP 5.6+, \PDO $db, MySQL
-	 * Maintain : $worlds (the servers list)
-	 *
-	 * Better use hook / cron to use this script automaticly !
-	 * 
-	 */
-
-
 	// ENV
 	ignore_user_abort(true);
 	set_time_limit(4800);
@@ -31,7 +8,7 @@ try
 	require_once('config.php');
 
 	// VARS
-	$hoursDelay = (60*60*2); // 2 hours (maximum pull frequency)
+	$hoursDelay = (60*60*24); // 24 hours (maximum pull frequency)
 
 	// Here we go ! 
 	$startedTimestamp = time();

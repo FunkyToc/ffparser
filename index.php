@@ -28,7 +28,8 @@ try {
 
 	// VARS
 	$results = [];
-	$search_players = !empty($_POST['search']) ? trim($_POST['search']) : '';
+	$search_guild = !empty(intval($_POST['search_guild'])) ? intval($_POST['search_guild']) : '';
+	$search_players = !empty(trim($_POST['search_players'])) ? trim($_POST['search_players']) : '';
 	
 	// SELECTED WORLD 
 	$serverSelected = isset($_POST['server']) ? trim($_POST['server']) : false;
@@ -41,11 +42,21 @@ try {
 	$checkWorld = $sql->fetch();
 	$results = json_decode($checkWorld['list']);
 
+	// SEARCH GUILD 
+	if (!empty($search_guild)) {
+
+		// GUILD check 
+
+		// PULL guild members 
+
+		// UPDATE search players 
+		$search_players = 'Some, players';		
+	}
 
 	// SEARCH PSEUDOS 
-	if (!empty($search_players) && !empty($results)) 
-	{	
-		$searches = explode(',', $search_players_list);
+	if (!empty($search_players) && !empty($results)) {
+
+		$searches = explode(',', $search_players);
 		$unique_ranks = []; // uniq player (no duplicate)  
 		$results_search = [];
 		$i = 0;
@@ -54,8 +65,8 @@ try {
 		{
 			foreach ($searches as $search_pseudo) 
 			{
-				if ( stristr($player->pseudo, trim(strip_tags($search_pseudo))) && array_search($player->rank, $unique_ranks) === false ) 
-				{
+				if ( stristr($player->pseudo, trim(strip_tags($search_pseudo))) && array_search($player->rank, $unique_ranks) === false ) {
+
 					$results_search[$i] = $player;
 					$unique_ranks[] = $player->rank;
 					$i++;
@@ -72,15 +83,23 @@ try {
 	<!-- SEARCH FORM START -->
 	<div id="search">
 		<form method="post">
-			<div>
+			<p>
+				<span>Server : </span>
 				<select name="server">
 					<?php foreach ($worlds as $world) { ?>
 						<option value="<?= $world ?>" <?= ($server == $world) ? 'selected' : ''?> ><?= $world ?></option>
 					<?php } ?>
 				</select>
-			</div>
+			</p>
 			<div>
-				<input type="text" name="search" placeholder="Kakie Tenno, Vaanh, vinou" value="<?= $search_players ?>">
+				<p>
+					<span>Guild ID : </span>
+					<input type="number" name="search_guild" placeholder="9235053248388270324" value="<?= $search_guild ?>">
+				</p>
+				<p>
+					<span>Search pseudos : </span>
+					<input type="text" name="search_players" placeholder="Your Pseudo, Cloud, Strife" value="<?= $search_players ?>">
+				</p>
 			</div>
 			<div>
 				<button type="submit">Chercher</button>
@@ -121,7 +140,7 @@ try {
 		<div id="playerList">
 			<p>No Datas</p>
 		</div>
-		
+
 	<?php } ?>	
 
 <?php 
