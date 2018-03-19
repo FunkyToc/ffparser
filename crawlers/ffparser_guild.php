@@ -3,12 +3,12 @@ try
 {
 	// ENV
 	ignore_user_abort(true);
-	set_time_limit(60);
+	set_time_limit(120);
 
-	require_once('config.php');
+	require_once('../config.php');
 
 	// VARS 
-	$guildID = !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing Guild ID');
+	$guildID = !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing guild ID');
 	$hoursDelay = (60*60*2); // 2 hours (maximum pull frequency)
 
 	// Here we go ! 
@@ -19,131 +19,96 @@ try
 	$results = [];
 
 	// DB last update check 
-	$sql = $db->prepare('SELECT id, pulldate, playersList FROM ffparser_guild WHERE guildID = :guildID LIMIT 1');
-	$sql->bindValue(':guildID', $guildID, PDO::PARAM_INT);
+	$sql = $db->prepare('SELECT id, pulldate FROM ffparser_guild WHERE guildID = :guildID LIMIT 1');
+	$sql->bindValue(':guildID', $guildID, PDO::PARAM_STR);
 	$sql->execute();
 	$checkGuild = $sql->fetch();
+
 
 	// Prevent Spam 
 	if (empty($checkGuild['id']) || (strtotime($checkGuild['pulldate']) + $hoursDelay) < time() ) {
 
-		die();
-		// Foreach Company Type ($gcid) 
-		for ($gcid = 1; $gcid < 4; $gcid++) 
+		// Guild info
+		libxml_use_internal_errors(true); // Hide the notice of HTML fetch DOM
+		$html 		= new DOMDocument();
+		$html->loadHtmlFile('https://fr.finalfantasyxiv.com/lodestone/freecompany/'. $guildID .'/member/');
+		$xpath 		= new DOMXPath($html);
+
+		// get city 
+		$results['city'] 	= trim(strip_tags($xpath->query("//div[@class='ldst__window']/div[@class='entry']/a/div[@class='entry__freecompany__box']/p[@class='entry__freecompany__gc']")->item(0)->nodeValue));
+
+	    // get world 
+		$results['guild'] 	= trim($xpath->query("//div[@class='ldst__window']/div[@class='entry']/a/div[@class='entry__freecompany__box']/p[@class='entry__freecompany__name']")->item(0)->nodeValue);
+
+	    // get guild name 
+		$results['world'] 	= trim($xpath->query("//div[@class='ldst__window']/div[@class='entry']/a/div[@class='entry__freecompany__box']/p[@class='entry__freecompany__gc']")->item(1)->nodeValue);
+
+
+		// Foreach pages of members (11-)
+		for ($i = 0; $i < 3; $i++) 
 		{ 
-			$inc = 0;
+			// Main fetch
+			libxml_use_internal_errors(true); // Hide the notice of HTML fetch DOM
+			$html 		= new DOMDocument();
+			$html->loadHtmlFile('https://fr.finalfantasyxiv.com/lodestone/freecompany/'. $guildID .'/member/?page='. ($i+1));
+			$xpath 		= new DOMXPath($html);
+			$players 	= $xpath->query("//div[@class='ldst__window']/ul/li/a[@class='entry__bg']");
 
-			// Foreach pages of the scoreboards (10)
-			for ($i = 0; $i < 5; $i++) 
-			{ 
-				// Main fetch
-				libxml_use_internal_errors(true); // Hide the notice of HTML fetch DOM
-				$html 		= new DOMDocument();
-				$html->loadHtmlFile('http://fr.finalfantasyxiv.com/lodestone/freecompany/9235053248388270324/member/&page='. ($i+1));
-				$xpath 		= new DOMXPath($html);
-				$players 	= $xpath->query("//ol[@class='list_ranking']/li/div/div[@class='list_body clearfix']");
+			// Break 
+			if (empty($players->length)) {
 				
-				
-				foreach ($players as $player) 
-				{
-					// Foreach $player html content, set a new DOMXPath
-				    $player_file = new DOMDocument();
-				    $cloned = $player->cloneNode(TRUE);
-				    $player_file->appendChild($player_file->importNode($cloned, True));
-				    $player_doc = new DOMXPath($player_file);
+				break;
+			}
 
-				    // get pseudo
-				    $name_tag = $player_doc->query("//div[@class='userdata']/div[@class='player_name_gold']/a");
-				    $pulledResult[$gcid][$inc]['pseudo'] = trim($name_tag->item(0)->nodeValue);
+			foreach ($players as $player) 
+			{
+				// Foreach $player html content, set a new DOMXPath
+			    $player_file = new DOMDocument();
+			    $cloned = $player->cloneNode(TRUE);
+			    $player_file->appendChild($player_file->importNode($cloned, True));
+			    $player_doc = new DOMXPath($player_file);
 
-				    // get score
-				    $score_tag = $player_doc->query("//div[@class='point txt_yellow']/div");
-				    $pulledResult[$gcid][$inc]['score'] = trim($score_tag->item(0)->nodeValue);
-
-				    // get rank
-				    $rank_tag = $player_doc->query("//div");
-				    $pulledResult[$gcid][$inc]['rank'] = intval(trim($rank_tag->item(0)->nodeValue));
-				    $pulledResult[$gcid][$inc]['rank'] = empty($pulledResult[$gcid][$inc]['rank']) ? ($inc+1) : $pulledResult[$gcid][$inc]['rank'];
-
-				    // get img
-				    $img_tag = $player_doc->query("//div[@class='userdata']/div[@class='thumb_wrap']/div[@class='thumb_cont_black']/a/img/@src");
-				    $pulledResult[$gcid][$inc]['img'] = trim($img_tag->item(0)->nodeValue);
-
-				    // get url
-				    $url_tag = $player_doc->query("//div[@class='userdata']/div[@class='thumb_wrap']/div[@class='thumb_cont_black']/a/@href");
-				    $pulledResult[$gcid][$inc]['url'] = trim($url_tag->item(0)->nodeValue);
-				    
-				    $inc++;
-				}
-			} // END 10 PAGES 
+			    // get pseudo
+			    $name_tag = $player_doc->query("//div[@class='entry__freecompany__center']/p[@class='entry__name']");
+			    $results['members'][] = trim($name_tag->item(0)->nodeValue);
+			}
 
 			// Keep turning ON the PDO connection (PDO connection close itself after 30s of inactivity) 
-			$sql = $db->prepare('SELECT id FROM ffparser WHERE 1 LIMIT 1');
+			$sql = $db->prepare('SELECT id FROM ffparser_guild WHERE 1 LIMIT 1');
 			$sql->execute();
 
-		} // END COMPANY 
-
-		// Compact results 
-		$inc = 1;
-		foreach ($pulledResult as $company => $playerList) 
-		{	
-			foreach ($playerList as $key => $player) 
-			{
-				$results[$inc] = $player;
-				$inc++;
-			}
-		}
-
-		// Order by score 
-		usort($results, function($a, $b) 
-		{
-		    return $b['score'] - $a['score'];
-		});
-
-		// Re-update rank 
-		foreach ($results as $key => $player) 
-		{
-			$results[$key]['rank'] = $key + 1;
-		}
-
+		} // END 10 PAGES 
 
 		// Push results (update or insert)
 		if (!empty($results)) {
 
-			$json_results = json_encode($results);
+			$results['members'] = json_encode($results['members']);
 
 			if (!empty($checkGuild['id'])) {
 
 				// Update world 
-				$sql = $db->prepare('UPDATE ffparser SET pulldate = NOW(), list = :list WHERE world = :world LIMIT 1');
-				$sql->bindValue(':world', $world, PDO::PARAM_STR);
-				$sql->bindValue(':list', $json_results, PDO::PARAM_STR);
+				$sql = $db->prepare('UPDATE ffparser_guild SET pulldate = NOW(), world = :world, city = :city, guildName = :guildName, guildID = :guildID, members = :members WHERE world = :world LIMIT 1');
+				$sql->bindValue(':world', $results['world'], PDO::PARAM_STR);
+				$sql->bindValue(':city', $results['city'], PDO::PARAM_STR);
+				$sql->bindValue(':guildID', $guildID, PDO::PARAM_STR);
+				$sql->bindValue(':guildName', $results['guild'], PDO::PARAM_STR);
+				$sql->bindValue(':members', $results['members'], PDO::PARAM_STR);
 				$sql->execute();
-
-				echo 'World <b>' . $world . '</b> updated<br>';
 			
 			} else {
 
 				// New world 
-				$sql = $db->prepare('INSERT INTO ffparser (world, pulldate, list) VALUES (:world, NOW(), :list)');
-				$sql->bindValue(':world', $world, PDO::PARAM_STR);
-				$sql->bindValue(':list', $json_results, PDO::PARAM_STR);
+				$sql = $db->prepare('INSERT INTO ffparser_guild (pulldate, world, city, guildName, guildID, members) VALUES (NOW(), :world, :city, :guildName, :guildID, :members)');
+				$sql->bindValue(':world', $results['world'], PDO::PARAM_STR);
+				$sql->bindValue(':city', $results['city'], PDO::PARAM_STR);
+				$sql->bindValue(':guildID', $guildID, PDO::PARAM_STR);
+				$sql->bindValue(':guildName', $results['guild'], PDO::PARAM_STR);
+				$sql->bindValue(':members', $results['members'], PDO::PARAM_STR);
 				$sql->execute();
 
-				echo 'World <b>' . $world . '</b> created<br>';
 			}
-		
-		} else {
-
-			echo 'World <b>' . $world . '</b> error<br>';
 		}
-		
-	}
-
-	// It's over !
-	$endedTimestamp = time();
-	$processTime = round(($endedTimestamp - $startedTimestamp) /60, 2);
-	echo '<br>Process complete ! (in '. $processTime .' minutes)'; 
+	} 
 
 }
 catch (Exception $e) 

@@ -5,7 +5,7 @@ try
 	ignore_user_abort(true);
 	set_time_limit(4800);
 
-	require_once('config.php');
+	require_once('../config.php');
 
 	// VARS
 	$hoursDelay = (60*60*24); // 24 hours (maximum pull frequency)
