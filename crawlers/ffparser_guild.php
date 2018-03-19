@@ -8,8 +8,8 @@ try
 	require_once('../config.php');
 
 	// VARS 
-	$guildID = !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing guild ID');
-
+	//$guildID = !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing guild ID');
+$guildID = '9235053248388270324';
 	// Here we go ! 
 	$startedTimestamp = time();
 	
@@ -32,6 +32,9 @@ try
 		$html 		= new DOMDocument();
 		$html->loadHtmlFile('https://fr.finalfantasyxiv.com/lodestone/freecompany/'. $guildID .'/member/');
 		$xpath 		= new DOMXPath($html);
+
+		// Init members 
+		$results['members'] = '';
 
 		// get city 
 		$results['city'] 	= trim(strip_tags($xpath->query("//div[@class='ldst__window']/div[@class='entry']/a/div[@class='entry__freecompany__box']/p[@class='entry__freecompany__gc']")->item(0)->nodeValue));
@@ -69,22 +72,21 @@ try
 
 			    // get pseudo
 			    $name_tag = $player_doc->query("//div[@class='entry__freecompany__center']/p[@class='entry__name']");
-			    $results['members'][] = trim($name_tag->item(0)->nodeValue);
+			    $results['members'] .= trim($name_tag->item(0)->nodeValue) .',';
 			}
 
 			// Keep turning ON the PDO connection (PDO connection close itself after 30s of inactivity) 
 			$sql = $db->prepare('SELECT id FROM ffparser_guild WHERE 1 LIMIT 1');
 			$sql->execute();
 
-		} // END 10 PAGES 
+		}
 
 		// Push results (update or insert)
 		if (!empty($results)) {
 
-			$results['members'] = json_encode($results['members']);
-
+			$results['members'] = rtrim($results['members'], ',');
+			
 			if (!empty($checkGuild['id'])) {
-
 				// Update world 
 				$sql = $db->prepare('UPDATE ffparser_guild SET pulldate = NOW(), world = :world, city = :city, guildName = :guildName, guildID = :guildID, members = :members WHERE world = :world LIMIT 1');
 				$sql->bindValue(':world', $results['world'], PDO::PARAM_STR);

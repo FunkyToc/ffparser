@@ -28,8 +28,8 @@ try {
 
 	// VARS
 	$results = [];
-	$search_guild = !empty(intval($_POST['search_guild'])) ? intval($_POST['search_guild']) : '';
-	$search_players = !empty(trim($_POST['search_players'])) ? trim($_POST['search_players']) : '';
+	$search_guild = isset($_POST['search_guild']) && !empty(trim($_POST['search_guild'])) ? trim($_POST['search_guild']) : '';
+	$search_players = isset($_POST['search_players']) && !empty(trim($_POST['search_players'])) ? trim($_POST['search_players']) : '';
 	
 	// SELECTED WORLD 
 	$serverSelected = isset($_POST['server']) ? trim($_POST['server']) : false;
@@ -40,20 +40,20 @@ try {
 
 		// GUILD check 
 		$sql = $db->prepare('SELECT id, pulldate, world, city, guildName, guildID, members FROM ffparser_guild WHERE guildID = :guildID LIMIT 1');
-		$sql->bindValue(':guildID', $guildID, PDO::PARAM_STR);
+		$sql->bindValue(':guildID', $search_guild, PDO::PARAM_STR);
 		$sql->execute();
 		$checkGuild = $sql->fetch();
-		$checkGuild['members'] = json_decode($checkGuild['members'], true)
 
-		if ($checkGuild['pulldate'] && !empty($checkGuild['members'])) {
+		if (!empty($checkGuild['id']) && (strtotime($checkGuild['pulldate']) + $guildHoursDelay) < time()) {
 
 			// PULL guild members 
 			// ajax
 			
-		} else {
+		} elseif (!empty($checkGuild['members'])) {
 
 			// UPDATE search players 
-			$search_players = 'Some, players';		
+			$search_players = $checkGuild['members'];
+			$server = $checkGuild['world'];
 		}
 	}
 
@@ -105,7 +105,7 @@ try {
 			<div>
 				<p>
 					<span>Guild ID : </span>
-					<input type="number" name="search_guild" placeholder="9235053248388270324" value="<?= $search_guild ?>">
+					<input type="text" name="search_guild" placeholder="9235053248388270324" value="<?= $search_guild ?>">
 				</p>
 				<p>
 					<span>Search pseudos : </span>
@@ -122,6 +122,13 @@ try {
 	<?php if (!empty($results)) { ?>
 		<!-- PLAYER LIST START -->
 		<div id="playerList">
+			
+			<?php if (!empty($checkGuild['id'])) { ?>
+				<div>
+					<h3><?= $checkGuild['guildName'] ?> (<?= $checkGuild['world'] ?>)</h3>
+				</div>
+			<?php } ?>
+
 			<table>
 
 				<tr>
