@@ -9,7 +9,6 @@ try
 
 	// VARS 
 	$guildID = !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing guild ID');
-	$hoursDelay = (60*60*2); // 2 hours (maximum pull frequency)
 
 	// Here we go ! 
 	$startedTimestamp = time();
@@ -26,7 +25,7 @@ try
 
 
 	// Prevent Spam 
-	if (empty($checkGuild['id']) || (strtotime($checkGuild['pulldate']) + $hoursDelay) < time() ) {
+	if (empty($checkGuild['id']) || (strtotime($checkGuild['pulldate']) + $guildHoursDelay) < time() ) {
 
 		// Guild info
 		libxml_use_internal_errors(true); // Hide the notice of HTML fetch DOM

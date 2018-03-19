@@ -35,23 +35,34 @@ try {
 	$serverSelected = isset($_POST['server']) ? trim($_POST['server']) : false;
 	$server = array_search($serverSelected, $worlds) !== false ? $worlds[array_search($serverSelected, $worlds)] : 'Mondial';
 
-	// DB check
+	// GUILD check 
+	if (!empty($search_guild)) {
+
+		// GUILD check 
+		$sql = $db->prepare('SELECT id, pulldate, world, city, guildName, guildID, members FROM ffparser_guild WHERE guildID = :guildID LIMIT 1');
+		$sql->bindValue(':guildID', $guildID, PDO::PARAM_STR);
+		$sql->execute();
+		$checkGuild = $sql->fetch();
+		$checkGuild['members'] = json_decode($checkGuild['members'], true)
+
+		if ($checkGuild['pulldate'] && !empty($checkGuild['members'])) {
+
+			// PULL guild members 
+			// ajax
+			
+		} else {
+
+			// UPDATE search players 
+			$search_players = 'Some, players';		
+		}
+	}
+
+	// WORLD check 
 	$sql = $db->prepare('SELECT id, pulldate, world, list FROM ffparser_ranking WHERE world = :world LIMIT 1');
 	$sql->bindValue(':world', $server, PDO::PARAM_STR);
 	$sql->execute();
 	$checkWorld = $sql->fetch();
 	$results = json_decode($checkWorld['list']);
-
-	// SEARCH GUILD 
-	if (!empty($search_guild)) {
-
-		// GUILD check 
-
-		// PULL guild members 
-
-		// UPDATE search players 
-		$search_players = 'Some, players';		
-	}
 
 	// SEARCH PSEUDOS 
 	if (!empty($search_players) && !empty($results)) {

@@ -7,9 +7,6 @@ try
 
 	require_once('../config.php');
 
-	// VARS
-	$hoursDelay = (60*60*24); // 24 hours (maximum pull frequency)
-
 	// Here we go ! 
 	$startedTimestamp = time();
 	
@@ -27,7 +24,7 @@ try
 		$checkWorld = $sql->fetch();
 
 		// Prevent Spam 
-		if (empty($checkWorld['id']) || (strtotime($checkWorld['pulldate']) + $hoursDelay) < time() ) {
+		if (empty($checkWorld['id']) || (strtotime($checkWorld['pulldate']) + $rankingHoursDelay) < time() ) {
 
 			// Foreach Company Type ($gcid) 
 			for ($gcid = 1; $gcid < 4; $gcid++) 
