@@ -36,7 +36,7 @@ try {
 	$server = array_search($serverSelected, $worlds) !== false ? $worlds[array_search($serverSelected, $worlds)] : 'Mondial';
 
 	// DB check
-	$sql = $db->prepare('SELECT id, pulldate, world, list FROM ffparser WHERE world = :world LIMIT 1');
+	$sql = $db->prepare('SELECT id, pulldate, world, list FROM ffparser_ranking WHERE world = :world LIMIT 1');
 	$sql->bindValue(':world', $server, PDO::PARAM_STR);
 	$sql->execute();
 	$checkWorld = $sql->fetch();

@@ -21,7 +21,7 @@ try
 		$results = [];
 
 		// DB last update check 
-		$sql = $db->prepare('SELECT id, pulldate FROM ffparser WHERE world = :world LIMIT 1');
+		$sql = $db->prepare('SELECT id, pulldate FROM ffparser_ranking WHERE world = :world LIMIT 1');
 		$sql->bindValue(':world', $world, PDO::PARAM_STR);
 		$sql->execute();
 		$checkWorld = $sql->fetch();
@@ -79,7 +79,7 @@ try
 				} // END 10 PAGES 
 
 				// Keep turning ON the PDO connection (PDO connection close itself after 30s of inactivity) 
-				$sql = $db->prepare('SELECT id FROM ffparser WHERE 1 LIMIT 1');
+				$sql = $db->prepare('SELECT id FROM ffparser_ranking WHERE 1 LIMIT 1');
 				$sql->execute();
 
 			} // END COMPANY 
@@ -116,7 +116,7 @@ try
 				if (!empty($checkWorld['id'])) {
 
 					// Update world 
-					$sql = $db->prepare('UPDATE ffparser SET pulldate = NOW(), list = :list WHERE world = :world LIMIT 1');
+					$sql = $db->prepare('UPDATE ffparser_ranking SET pulldate = NOW(), list = :list WHERE world = :world LIMIT 1');
 					$sql->bindValue(':world', $world, PDO::PARAM_STR);
 					$sql->bindValue(':list', $json_results, PDO::PARAM_STR);
 					$sql->execute();
@@ -126,7 +126,7 @@ try
 				} else {
 
 					// New world 
-					$sql = $db->prepare('INSERT INTO ffparser (world, pulldate, list) VALUES (:world, NOW(), :list)');
+					$sql = $db->prepare('INSERT INTO ffparser_ranking (world, pulldate, list) VALUES (:world, NOW(), :list)');
 					$sql->bindValue(':world', $world, PDO::PARAM_STR);
 					$sql->bindValue(':list', $json_results, PDO::PARAM_STR);
 					$sql->execute();
