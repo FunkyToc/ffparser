@@ -8,10 +8,8 @@ try
 	require_once('../config.php');
 
 	// VARS 
-	//$guildID = !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing guild ID');
-$guildID = '9235053248388270324';
-	// Here we go ! 
-	$startedTimestamp = time();
+	$guildID = isset($_POST['GuildID']) && !empty(intval($_POST['GuildID'])) ? intval($_POST['GuildID']) : die('missing guild ID');
+	// $guildID = '9235053248388270324';
 	
 	// PARSER 
 	$pulledResult = [];
@@ -47,7 +45,7 @@ $guildID = '9235053248388270324';
 
 
 		// Foreach pages of members (11-)
-		for ($i = 0; $i < 3; $i++) 
+		for ($i = 0; $i < 10; $i++) 
 		{ 
 			// Main fetch
 			libxml_use_internal_errors(true); // Hide the notice of HTML fetch DOM
@@ -108,8 +106,12 @@ $guildID = '9235053248388270324';
 				$sql->execute();
 
 			}
+
+			echo 'true'; die;
 		}
 	} 
+
+	echo 'false'; die;
 
 }
 catch (Exception $e) 

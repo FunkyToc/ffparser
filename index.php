@@ -44,10 +44,12 @@ try {
 		$sql->execute();
 		$checkGuild = $sql->fetch();
 
-		if (!empty($checkGuild['id']) && (strtotime($checkGuild['pulldate']) + $guildHoursDelay) < time()) {
+		if (empty($checkGuild['id']) || (strtotime($checkGuild['pulldate']) + $guildHoursDelay) < time()) {
 
 			// PULL guild members 
-			// ajax
+
+			// reload 
+
 			
 		} elseif (!empty($checkGuild['members'])) {
 
