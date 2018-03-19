@@ -9,14 +9,14 @@ try
 	 * Author : FunkyToc
 	 * Website : http://funkycoding.fr
 	 * Exemple : http://funkycoding.fr/ffparser
-	 * Update : 2018/03/07
+	 * Update : 2018/03/19
 	 *
 	 * Url : http://fr.finalfantasyxiv.com
 	 * Target : http://fr.finalfantasyxiv.com/lodestone/ranking/gc/weekly/
 	 * Frequency : 1 / week
 	 * Pulldate : every Monday, at 11AM
 	 * Pulltime : ~1H / 1800 pages
-	 * Requires : PHP 5.6+, PDO $db, MySQL
+	 * Requires : PHP 5.6+, \PDO $db, MySQL
 	 * Maintain : $worlds (the servers list)
 	 *
 	 * Better use hook / cron to use this script automaticly !
@@ -28,30 +28,14 @@ try
 	ignore_user_abort(true);
 	set_time_limit(4800);
 
+	require_once('config.php');
+
 	// VARS
 	$hoursDelay = (60*60*2); // 2 hours (maximum pull frequency)
-
-	// DB CONNECTION 
-	$sql_host = 'host';
-	$sql_dbname = 'fftopplayers';
-	$sql_user = 'root';
-	$sql_pass = '';
-	$db_options = array(
-	    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-	    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-	    PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING
-	);
-	$db = new PDO('mysql:host='. $sql_host .';dbname='. $sql_dbname, $sql_user, $sql_pass, $db_options);
-
-
 
 	// Here we go ! 
 	$startedTimestamp = time();
 	
-	// Allowed server names 
-	$worlds = array('Mondial', 'Louisoix', 'Adamantoise', 'Aegis', 'Alexander', 'Anima', 'Asura', 'Atomos', 'Bahamut', 'Balmung', 'Behemoth', 'Belias', 'Brynhildr', 'Cactuar', 'Carbuncle', 'Cerberus', 'Chocobo', 'Coeurl', 'Diabolos', 'Durandal', 'Excalibur', 'Exodus', 'Faerie', 'Famfrit', 'Fenrir', 'Garuda', 'Gilgamesh', 'Goblin', 'Gungnir', 'Hades', 'Hyperion', 'Ifrit', 'Ixion', 'Jenova', 'Kujata', 'Lamia', 'Leviathan', 'Lich', 'Malboro', 'Mandragora', 'Masamune', 'Mateus', 'Midgardsormr', 'Moogle', 'Odin', 'Omega', 'Pandaemonium', 'Phoenix', 'Ragnarok', 'Ramuh', 'Ridill', 'Sargatanas', 'Shinryu', 'Shiva', 'Siren', 'Tiamat', 'Titan', 'Tonberry', 'Typhon', 'Ultima', 'Ultros', 'Unicorn', 'Valefor', 'Yojimbo', 'Zalera', 'Zeromus', 'Zodiark');
-
-
 	// PARSER 
 	foreach ($worlds as $world) 
 	{
