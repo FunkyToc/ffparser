@@ -25,7 +25,6 @@
 try {
 
 	require_once('config.php');
-	require_once('crawlers/ffparser_guild.php');
 
 	// VARS
 	$results = [];
@@ -47,6 +46,8 @@ try {
 
 		if (empty($checkGuild['id']) || (strtotime($checkGuild['pulldate']) + $guildHoursDelay) < time()) {
 
+			require_once('crawlers/ffparser_guild.php');
+			
 			// PULL guild members 
 			if (getGuildMember($search_guild)) {
 				
