@@ -25,6 +25,7 @@
 try {
 
 	require_once('config.php');
+	require_once('crawlers/ffparser_guild.php');
 
 	// VARS
 	$results = [];
@@ -47,9 +48,16 @@ try {
 		if (empty($checkGuild['id']) || (strtotime($checkGuild['pulldate']) + $guildHoursDelay) < time()) {
 
 			// PULL guild members 
+			if (getGuildMember($search_guild)) {
+				
+				$sql = $db->prepare('SELECT id, pulldate, world, city, guildName, guildID, members FROM ffparser_guild WHERE guildID = :guildID LIMIT 1');
+				$sql->bindValue(':guildID', $search_guild, PDO::PARAM_STR);
+				$sql->execute();
+				$checkGuild = $sql->fetch();
 
-			// reload 
-
+				$search_players = $checkGuild['members'];
+				$server = $checkGuild['world'];
+			}
 			
 		} elseif (!empty($checkGuild['members'])) {
 
@@ -127,7 +135,7 @@ try {
 			
 			<?php if (!empty($checkGuild['id'])) { ?>
 				<div>
-					<h3><?= $checkGuild['guildName'] ?> (<?= $checkGuild['world'] ?>)</h3>
+					<h3 style="color: darkblue"><?= $checkGuild['guildName'] ?> (<?= $checkGuild['world'] ?>)</h3>
 				</div>
 			<?php } ?>
 
@@ -154,10 +162,15 @@ try {
 			</table>
 		</div>
 		<!-- PLAYER LIST END -->
+	<?php } elseif (empty($result) && !empty($search_guild)) { ?>
+
+		<div>
+			<p>No Datas with this Guild</p>
+		</div>
 
 	<?php } else { ?>
 
-		<div id="playerList">
+		<div>
 			<p>No Datas</p>
 		</div>
 

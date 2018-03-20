@@ -1,4 +1,19 @@
 <?php 
+
+/* 
+ * Final Fantasy 14 Online Parser
+ * Mannualy launch this script to recover server's scoreboards.
+ *
+ * Frequency : 1 / week
+ * Pulldate : every Monday, at 11AM
+ * Pulltime : ~1H / 1800 pages
+ * Requires : PHP 5.6+, \PDO $db, MySQL
+ * Maintain : $worlds (the servers list)
+ *
+ * Better use hook / cron to use this script automaticly !
+ * 
+ */
+
 try 
 {
 	// ENV
