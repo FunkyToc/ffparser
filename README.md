@@ -8,7 +8,7 @@ Datas are stored in SQL database, with Json format.
 * Name : FunkyToc 
 * Website : http://funkycoding.fr 
 * FfParser : http://funkycoding.fr/ffparser 
-* Update : 2018/03/19 
+* Update : 2019/02/11 
 
 // Project
 * Url : http://fr.finalfantasyxiv.com 
@@ -21,7 +21,9 @@ Datas are stored in SQL database, with Json format.
 
 Better to c*r*onfigure hook / cron to use this script automaticly !
 
+
 // Versions
 
-* V1.1 : add front view, input search pseudo.
-* V1.0 : init, php web crawler, SQL stock.
+* V1.2.0 : update with 2019's new html.
+* V1.1.0 : add front view, input search pseudo.
+* V1.0.0 : init, php web crawler, SQL stock.

@@ -8,7 +8,7 @@
  * Author : FunkyToc
  * Website : http://funkycoding.fr
  * Exemple : http://funkycoding.fr/ffparser
- * Update : 2018/03/19
+ * Update : 2019/02/11
  *
  * Url : http://fr.finalfantasyxiv.com
  * Target : http://fr.finalfantasyxiv.com/lodestone/ranking/gc/weekly/
@@ -16,9 +16,9 @@
  * Pulldate : every Monday, at 11AM
  * Pulltime : ~1H / 1800 pages
  * Requires : PHP 5.6+, \PDO $db, MySQL
- * Maintain : $worlds (the servers list)
+ * Maintain : $worlds (the servers list), xpath queries (html targets)
  *
- * Better use hook / cron to use this script automaticly !
+ * Better use hook/cron to update scoreboards automaticly !
  * 
  */
 
